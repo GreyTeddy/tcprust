@@ -19,11 +19,13 @@ fn main() {
             handle_connection(stream);
         });
     }
+    println!("Shutting down.");
 }
 
 fn handle_connection(mut stream: std::net::TcpStream) {
     let response = create_response(&stream);
     stream.write_all(response.as_bytes()).unwrap();
+    stream.flush().unwrap();
 }
 
 fn create_response(mut stream: &std::net::TcpStream) -> String {
@@ -34,7 +36,7 @@ fn create_response(mut stream: &std::net::TcpStream) -> String {
         "GET / HTTP/1.1" => ("HTTP/1.1 200 OK", "src/pages/hello.html"),
         "GET /sleep HTTP/1.1" => {
             thread::sleep(Duration::from_secs(5));
-            ("HTTP/1.1 200 OK", "src/pages/hello.html" )
+            ("HTTP/1.1 200 OK", "src/pages/hello.html")
         }
         _ => ("HTTP/1.1 404 NOT FOUND", "src/pages/404.html"),
     };
